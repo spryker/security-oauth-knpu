@@ -1,0 +1,9 @@
+key,translation,locale
+customer.login.or,oder,de_DE
+customer.login.or,or,en_US
+security_oauth_knpu:login:sso,Anmeldung mit SSO,de_DE
+security_oauth_knpu:login:sso,Login with SSO,en_US
+security_oauth_knpu:login:sso,Mit GitHub anmelden,de_DE
+security_oauth_knpu:login:sso,Login with GitHub,en_US
+security_oauth_knpu.error.provider_not_found,OAuth-Anmeldung ist nicht verfügbar.,de_DE
+security_oauth_knpu.error.provider_not_found,OAuth login is unavailable.,en_US

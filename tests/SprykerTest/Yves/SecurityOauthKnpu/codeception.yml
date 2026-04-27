@@ -1,0 +1,28 @@
+namespace: SprykerTest\Yves\SecurityOauthKnpu
+paths:
+    tests: .
+    data: ../../../_data
+    support: _support
+    output: ../../../_output
+coverage:
+    enabled: true
+    remote: false
+    whitelist:
+        include:
+            - '../../../../src/*'
+suites:
+    Yves:
+        path: .
+        actor: SecurityOauthKnpuYvesTester
+        modules:
+            enabled:
+                - Asserts
+                - \SprykerTest\Shared\Testify\Helper\Environment
+                - \SprykerTest\Shared\Testify\Helper\ConfigHelper
+                - \SprykerTest\Shared\Testify\Helper\LocatorHelper
+                - \SprykerTest\Shared\Testify\Helper\DependencyHelper
+                - \SprykerTest\Yves\Testify\Helper\DependencyProviderHelper
+                - \SprykerTest\Yves\Testify\Helper\FactoryHelper
+                - \SprykerTest\Yves\Locale\Helper\LocaleHelper
+                - \SprykerTest\Yves\Application\Helper\ApplicationHelper
+                - \SprykerTest\Service\Container\Helper\ContainerHelper

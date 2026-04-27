@@ -1,0 +1,6 @@
+{
+    "include": {
+        "knpuniversity/oauth2-client-bundle": "Uses KnpuOAuth2ClientBundle's ClientRegistry from Symfony container.",
+        "spryker/transfer": "Provides transfer objects definition with strict types."
+    }
+}

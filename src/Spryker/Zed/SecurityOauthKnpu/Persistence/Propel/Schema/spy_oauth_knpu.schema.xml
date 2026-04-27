@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<database xmlns="spryker:schema-01"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="zed"
+    xsi:schemaLocation="spryker:schema-01 https://static.spryker.com/schema-01.xsd"
+    namespace="Orm\Zed\SecurityOauthKnpu\Persistence"
+    package="src.Orm.Zed.SecurityOauthKnpu.Persistence">
+
+    <table name="spy_oauth_knpu_user_identity" idMethod="native" allowPkInsert="true">
+        <column name="id_oauth_knpu_user_identity" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+        <column name="fk_user" type="INTEGER" required="true"/>
+        <column name="provider" type="VARCHAR" size="64" required="true"/>
+        <column name="external_id" type="VARCHAR" size="255" required="true"/>
+        <column name="email" type="VARCHAR" size="255" required="false"/>
+
+        <foreign-key name="spy_oauth_knpu_user_identity-fk_user" foreignTable="spy_user" onDelete="CASCADE">
+            <reference local="fk_user" foreign="id_user"/>
+        </foreign-key>
+
+        <unique name="spy_oauth_knpu_user_identity-unique-provider-external_id">
+            <unique-column name="provider"/>
+            <unique-column name="external_id"/>
+        </unique>
+
+        <unique name="spy_oauth_knpu_user_identity-unique-fk_user-provider">
+            <unique-column name="fk_user"/>
+            <unique-column name="provider"/>
+        </unique>
+
+        <behavior name="timestampable"/>
+    </table>
+
+    <table name="spy_oauth_knpu_customer_identity" idMethod="native" allowPkInsert="true">
+        <column name="id_oauth_knpu_customer_identity" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+        <column name="fk_customer" type="INTEGER" required="true"/>
+        <column name="provider" type="VARCHAR" size="64" required="true"/>
+        <column name="external_id" type="VARCHAR" size="255" required="true"/>
+        <column name="email" type="VARCHAR" size="255" required="false"/>
+
+        <foreign-key name="spy_oauth_knpu_customer_identity-fk_customer" foreignTable="spy_customer" onDelete="CASCADE">
+            <reference local="fk_customer" foreign="id_customer"/>
+        </foreign-key>
+
+        <unique name="spy_oauth_knpu_customer_identity-unique-provider-external_id">
+            <unique-column name="provider"/>
+            <unique-column name="external_id"/>
+        </unique>
+
+        <unique name="spy_oauth_knpu_customer_identity-unique-fk_customer-provider">
+            <unique-column name="fk_customer"/>
+            <unique-column name="provider"/>
+        </unique>
+
+        <behavior name="timestampable"/>
+    </table>
+
+    <table name="spy_oauth_knpu_merchant_user_identity" idMethod="native" allowPkInsert="true">
+        <column name="id_oauth_knpu_merchant_user_identity" type="INTEGER" primaryKey="true" autoIncrement="true"/>
+        <column name="fk_merchant_user" type="INTEGER" required="true"/>
+        <column name="provider" type="VARCHAR" size="64" required="true"/>
+        <column name="external_id" type="VARCHAR" size="255" required="true"/>
+        <column name="email" type="VARCHAR" size="255" required="false"/>
+
+        <foreign-key name="spy_oauth_knpu_merchant_user_identity-fk_merchant_user" foreignTable="spy_merchant_user" onDelete="CASCADE">
+            <reference local="fk_merchant_user" foreign="id_merchant_user"/>
+        </foreign-key>
+
+        <unique name="spy_oauth_knpu_merchant_user_identity-unique-provider-external_id">
+            <unique-column name="provider"/>
+            <unique-column name="external_id"/>
+        </unique>
+
+        <unique name="spy_oauth_knpu_merchant_user_identity-unique-fk_merchant_user-provider">
+            <unique-column name="fk_merchant_user"/>
+            <unique-column name="provider"/>
+        </unique>
+
+        <behavior name="timestampable"/>
+    </table>
+
+</database>
