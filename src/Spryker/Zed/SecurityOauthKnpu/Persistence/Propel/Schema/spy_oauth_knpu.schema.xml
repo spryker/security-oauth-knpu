@@ -28,6 +28,7 @@
         </unique>
 
         <behavior name="timestampable"/>
+        <id-method-parameter value="spy_oauth_knpu_user_identity_pk_seq"/>
     </table>
 
     <table name="spy_oauth_knpu_customer_identity" idMethod="native" allowPkInsert="true">
@@ -52,6 +53,7 @@
         </unique>
 
         <behavior name="timestampable"/>
+        <id-method-parameter value="spy_oauth_knpu_customer_identity_pk_seq"/>
     </table>
 
     <table name="spy_oauth_knpu_merchant_user_identity" idMethod="native" allowPkInsert="true">
@@ -76,6 +78,7 @@
         </unique>
 
         <behavior name="timestampable"/>
+        <id-method-parameter value="spy_oauth_knpu_merchant_user_identity_pk_seq"/>
     </table>
 
 </database>
