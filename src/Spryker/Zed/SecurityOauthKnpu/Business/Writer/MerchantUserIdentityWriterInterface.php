@@ -11,8 +11,11 @@ namespace Spryker\Zed\SecurityOauthKnpu\Business\Writer;
 
 use Generated\Shared\Transfer\MerchantUserTransfer;
 use Generated\Shared\Transfer\ResourceOwnerTransfer;
+use Generated\Shared\Transfer\UserCollectionResponseTransfer;
 
 interface MerchantUserIdentityWriterInterface
 {
     public function persistMerchantUserIdentityByResourceOwner(MerchantUserTransfer $merchantUserTransfer, ResourceOwnerTransfer $resourceOwnerTransfer): void;
+
+    public function removeMerchantUserIdentities(UserCollectionResponseTransfer $userCollectionResponseTransfer): UserCollectionResponseTransfer;
 }

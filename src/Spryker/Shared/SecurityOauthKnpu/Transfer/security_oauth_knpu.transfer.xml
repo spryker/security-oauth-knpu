@@ -132,4 +132,8 @@
     <transfer name="AclEntityRule">
     </transfer>
 
+    <transfer name="UserCollectionResponse" strict="true">
+        <property name="users" type="User[]" singular="user"/>
+    </transfer>
+
 </transfers>

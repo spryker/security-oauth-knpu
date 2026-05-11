@@ -30,4 +30,9 @@ interface SecurityOauthKnpuEntityManagerInterface
     public function updateMerchantUserIdentity(
         OauthKnpuMerchantUserIdentityTransfer $oauthKnpuMerchantUserIdentityTransfer
     ): OauthKnpuMerchantUserIdentityTransfer;
+
+    /**
+     * @param array<int> $merchantUserIdentityIds
+     */
+    public function removeMerchantUserIdentitiesByIds(array $merchantUserIdentityIds): void;
 }

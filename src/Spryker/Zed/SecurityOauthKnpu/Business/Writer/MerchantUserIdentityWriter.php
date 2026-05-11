@@ -13,11 +13,14 @@ use Generated\Shared\Transfer\MerchantUserTransfer;
 use Generated\Shared\Transfer\OauthKnpuIdentityCriteriaTransfer;
 use Generated\Shared\Transfer\OauthKnpuMerchantUserIdentityTransfer;
 use Generated\Shared\Transfer\ResourceOwnerTransfer;
+use Generated\Shared\Transfer\UserCollectionResponseTransfer;
 use Spryker\Zed\SecurityOauthKnpu\Persistence\SecurityOauthKnpuEntityManagerInterface;
 use Spryker\Zed\SecurityOauthKnpu\Persistence\SecurityOauthKnpuRepositoryInterface;
 
 class MerchantUserIdentityWriter implements MerchantUserIdentityWriterInterface
 {
+    protected const string USER_STATUS_DELETED = 'deleted';
+
     public function __construct(
         protected SecurityOauthKnpuRepositoryInterface $securityOauthKnpuRepository,
         protected SecurityOauthKnpuEntityManagerInterface $securityOauthKnpuEntityManager,
@@ -54,5 +57,31 @@ class MerchantUserIdentityWriter implements MerchantUserIdentityWriterInterface
         }
 
         $this->securityOauthKnpuEntityManager->createMerchantUserIdentity($merchantUserIdentityTransfer);
+    }
+
+    public function removeMerchantUserIdentities(UserCollectionResponseTransfer $userCollectionResponseTransfer): UserCollectionResponseTransfer
+    {
+        $userIds = [];
+        foreach ($userCollectionResponseTransfer->getUsers() as $userTransfer) {
+            if ($userTransfer->getStatus() !== static::USER_STATUS_DELETED) {
+                continue;
+            }
+
+            $userIds[] = $userTransfer->getIdUserOrFail();
+        }
+
+        if ($userIds === []) {
+            return $userCollectionResponseTransfer;
+        }
+
+        $merchantUserIdentityIds = $this->securityOauthKnpuRepository->getMerchantUserIdentityIdsByUserIds($userIds);
+
+        if ($merchantUserIdentityIds === []) {
+            return $userCollectionResponseTransfer;
+        }
+
+        $this->securityOauthKnpuEntityManager->removeMerchantUserIdentitiesByIds($merchantUserIdentityIds);
+
+        return $userCollectionResponseTransfer;
     }
 }

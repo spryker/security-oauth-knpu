@@ -2,5 +2,8 @@
     "include": {
         "knpuniversity/oauth2-client-bundle": "Uses KnpuOAuth2ClientBundle's ClientRegistry from Symfony container.",
         "spryker/transfer": "Provides transfer objects definition with strict types."
+    },
+    "exclude": {
+        "spryker/merchant-user": "Optional — required only for Merchant Portal OAuth."
     }
 }

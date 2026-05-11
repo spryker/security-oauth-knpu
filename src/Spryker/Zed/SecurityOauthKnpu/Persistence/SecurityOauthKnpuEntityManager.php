@@ -99,6 +99,17 @@ class SecurityOauthKnpuEntityManager extends AbstractEntityManager implements Se
             ->mapOauthKnpuMerchantUserIdentityEntityToOauthKnpuMerchantUserIdentityTransfer($oauthKnpuMerchantUserIdentityEntity, $oauthKnpuMerchantUserIdentityTransfer);
     }
 
+    /**
+     * @param array<int> $merchantUserIdentityIds
+     */
+    public function removeMerchantUserIdentitiesByIds(array $merchantUserIdentityIds): void
+    {
+        $this->getFactory()
+            ->getOauthKnpuMerchantUserIdentityQuery()
+            ->filterByIdOauthKnpuMerchantUserIdentity_In($merchantUserIdentityIds)
+            ->delete();
+    }
+
     public function updateMerchantUserIdentity(
         OauthKnpuMerchantUserIdentityTransfer $oauthKnpuMerchantUserIdentityTransfer
     ): OauthKnpuMerchantUserIdentityTransfer {

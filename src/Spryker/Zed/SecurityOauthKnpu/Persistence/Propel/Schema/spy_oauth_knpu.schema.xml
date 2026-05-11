@@ -63,10 +63,6 @@
         <column name="external_id" type="VARCHAR" size="255" required="true"/>
         <column name="email" type="VARCHAR" size="255" required="false"/>
 
-        <foreign-key name="spy_oauth_knpu_merchant_user_identity-fk_merchant_user" foreignTable="spy_merchant_user" onDelete="CASCADE">
-            <reference local="fk_merchant_user" foreign="id_merchant_user"/>
-        </foreign-key>
-
         <unique name="spy_oauth_knpu_merchant_user_identity-unique-provider-external_id">
             <unique-column name="provider"/>
             <unique-column name="external_id"/>

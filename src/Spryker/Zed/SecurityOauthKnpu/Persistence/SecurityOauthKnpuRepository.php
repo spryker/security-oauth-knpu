@@ -13,9 +13,11 @@ use Generated\Shared\Transfer\OauthKnpuCustomerIdentityTransfer;
 use Generated\Shared\Transfer\OauthKnpuIdentityCriteriaTransfer;
 use Generated\Shared\Transfer\OauthKnpuMerchantUserIdentityTransfer;
 use Generated\Shared\Transfer\OauthKnpuUserIdentityTransfer;
+use Orm\Zed\SecurityOauthKnpu\Persistence\Map\SpyOauthKnpuMerchantUserIdentityTableMap;
 use Orm\Zed\SecurityOauthKnpu\Persistence\SpyOauthKnpuCustomerIdentityQuery;
 use Orm\Zed\SecurityOauthKnpu\Persistence\SpyOauthKnpuMerchantUserIdentityQuery;
 use Orm\Zed\SecurityOauthKnpu\Persistence\SpyOauthKnpuUserIdentityQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Spryker\Zed\Kernel\Persistence\AbstractRepository;
 
 /**
@@ -53,6 +55,28 @@ class SecurityOauthKnpuRepository extends AbstractRepository implements Security
         return $this->getFactory()
             ->createOauthKnpuIdentityMapper()
             ->mapOauthKnpuUserIdentityEntityToOauthKnpuUserIdentityTransfer($oauthKnpuUserIdentity, new OauthKnpuUserIdentityTransfer());
+    }
+
+    /**
+     * @module MerchantUser
+     *
+     * @param array<int> $userIds
+     *
+     * @return array<int>
+     */
+    public function getMerchantUserIdentityIdsByUserIds(array $userIds): array
+    {
+        return $this->getFactory()
+            ->getOauthKnpuMerchantUserIdentityQuery()
+            ->addJoin(
+                SpyOauthKnpuMerchantUserIdentityTableMap::COL_FK_MERCHANT_USER,
+                'spy_merchant_user.id_merchant_user',
+                Criteria::INNER_JOIN,
+            )
+            ->add('spy_merchant_user.fk_user', $userIds, Criteria::IN)
+            ->select([SpyOauthKnpuMerchantUserIdentityTableMap::COL_ID_OAUTH_KNPU_MERCHANT_USER_IDENTITY])
+            ->find()
+            ->getArrayCopy();
     }
 
     public function findMerchantUserIdentity(OauthKnpuIdentityCriteriaTransfer $oauthKnpuIdentityCriteriaTransfer): ?OauthKnpuMerchantUserIdentityTransfer

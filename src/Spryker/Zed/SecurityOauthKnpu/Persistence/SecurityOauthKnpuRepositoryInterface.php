@@ -21,4 +21,11 @@ interface SecurityOauthKnpuRepositoryInterface
     public function findUserIdentity(OauthKnpuIdentityCriteriaTransfer $oauthKnpuIdentityCriteriaTransfer): ?OauthKnpuUserIdentityTransfer;
 
     public function findMerchantUserIdentity(OauthKnpuIdentityCriteriaTransfer $oauthKnpuIdentityCriteriaTransfer): ?OauthKnpuMerchantUserIdentityTransfer;
+
+    /**
+     * @param array<int> $userIds
+     *
+     * @return array<int>
+     */
+    public function getMerchantUserIdentityIdsByUserIds(array $userIds): array;
 }
