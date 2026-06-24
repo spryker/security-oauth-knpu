@@ -23,6 +23,9 @@ use Symfony\Component\Routing\Router;
  */
 class OauthKnpuApplicationPlugin extends AbstractPlugin implements ApplicationPluginInterface
 {
+    /**
+     * @api
+     */
     public const string SERVICE_OAUTH_CLIENT_REGISTRY = 'oauth.client_registry';
 
     protected const string KNPU_OAUTH_REGISTRY_SERVICE_ID = 'knpu.oauth2.registry';
