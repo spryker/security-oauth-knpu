@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Spryker\Zed\SecurityOauthKnpu;
 
+use Generated\Shared\Transfer\OauthKnpuProviderConfigTransfer;
 use Spryker\Zed\Kernel\AbstractBundleConfig;
 
 class SecurityOauthKnpuConfig extends AbstractBundleConfig
@@ -19,6 +20,10 @@ class SecurityOauthKnpuConfig extends AbstractBundleConfig
      * @uses \Spryker\Zed\SecurityGui\SecurityGuiConfig::LOGIN_PATH
      */
     protected const string URL_ZED_LOGIN = '/security-gui/login';
+
+    protected const string CONFIGURATION_KEY_MERCHANT_PORTAL_PROVIDERS = 'integrations:federated_authentication:merchant_portal:providers';
+
+    protected const string CONFIGURATION_KEY_BACKOFFICE_PROVIDERS = 'integrations:federated_authentication:backoffice:providers';
 
     /**
      * Specification:
@@ -46,8 +51,9 @@ class SecurityOauthKnpuConfig extends AbstractBundleConfig
 
     /**
      * Specification:
-     * - Returns the list of configured OAuth provider configs for Merchant Portal users.
-     * - Override at project level to define providers.
+     * - Returns the list of OAuth provider configs for Merchant Portal users.
+     * - Reads provider entries from the Back Office configuration.
+     * - Returns an empty array when no providers are configured.
      *
      * @api
      *
@@ -55,13 +61,37 @@ class SecurityOauthKnpuConfig extends AbstractBundleConfig
      */
     public function getMerchantUserProviderConfigs(): array
     {
-        return [];
+        $providersJson = $this->getModuleConfig(static::CONFIGURATION_KEY_MERCHANT_PORTAL_PROVIDERS, '[]');
+        $providers = json_decode((string)$providersJson, true);
+
+        if (!is_array($providers)) {
+            return [];
+        }
+
+        $oauthKnpuProviderConfigTransfers = [];
+
+        foreach ($providers as $provider) {
+            if (!is_array($provider)) {
+                continue;
+            }
+
+            $oauthKnpuProviderConfigTransfer = (new OauthKnpuProviderConfigTransfer())->fromArray($provider, true);
+
+            if (!$oauthKnpuProviderConfigTransfer->getStatePrefix()) {
+                $oauthKnpuProviderConfigTransfer->setStatePrefix($oauthKnpuProviderConfigTransfer->getClientNameOrFail());
+            }
+
+            $oauthKnpuProviderConfigTransfers[] = $oauthKnpuProviderConfigTransfer;
+        }
+
+        return $oauthKnpuProviderConfigTransfers;
     }
 
     /**
      * Specification:
-     * - Returns the list of configured OAuth provider configs for Zed backoffice users.
-     * - Override at project level to define providers.
+     * - Returns the OAuth provider config for Zed backoffice users.
+     * - Reads provider entries from the Back Office configuration.
+     * - Returns an empty array when no provider is configured.
      *
      * @api
      *
@@ -69,6 +99,29 @@ class SecurityOauthKnpuConfig extends AbstractBundleConfig
      */
     public function getZedUserProviderConfigs(): array
     {
-        return [];
+        $providersJson = $this->getModuleConfig(static::CONFIGURATION_KEY_BACKOFFICE_PROVIDERS, '[]');
+        $providers = json_decode((string)$providersJson, true);
+
+        if (!is_array($providers)) {
+            return [];
+        }
+
+        $oauthKnpuProviderConfigTransfers = [];
+
+        foreach ($providers as $provider) {
+            if (!is_array($provider)) {
+                continue;
+            }
+
+            $transfer = (new OauthKnpuProviderConfigTransfer())->fromArray($provider, true);
+
+            if (!$transfer->getStatePrefix()) {
+                $transfer->setStatePrefix($transfer->getClientNameOrFail());
+            }
+
+            $oauthKnpuProviderConfigTransfers[] = $transfer;
+        }
+
+        return $oauthKnpuProviderConfigTransfers;
     }
 }

@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../../../Spryker/Configuration/resources/configuration/configuration-schema-v1.json
+features:
+    - key: integrations
+      name: Integrations
+      description: Third-party integrations configuration.
+      enabled: true
+      order: 100
+      tabs:
+          - key: federated_authentication
+            name: Federated Authentication (SSO)
+            description: SSO provider configuration for Back Office, Merchant Portal, and Storefront.
+            enabled: true
+            order: 100
+            groups:
+                - key: backoffice
+                  name: Back Office
+                  description: OAuth provider configuration for the Back Office login page.
+                  scopes:
+                      - global
+                  enabled: true
+                  settings:
+                      - key: providers
+                        name: SSO Provider
+                        description: >
+                            Configures the SSO login button on the Back Office login page.
+                            client_name must match a key defined in config/Zed/packages/knpu_oauth2_client.yaml.
+                        type: json
+                        template: '@SecurityOauthKnpu/Configuration/provider.twig'
+                        default_value: []
+                        enabled: true
+                        secret: false
+                        storefront: false
+                        scopes:
+                            - global
+
+                - key: merchant_portal
+                  name: Merchant Portal
+                  description: OAuth providers available on the Merchant Portal login page.
+                  scopes:
+                      - global
+                  enabled: true
+                  settings:
+                      - key: providers
+                        name: SSO Providers
+                        description: >
+                            Each provider entry configures one SSO login button.
+                            client_name must match a key defined in config/MerchantPortal/packages/knpu_oauth2_client.yaml.
+                        type: json
+                        template: '@SecurityOauthKnpu/Configuration/provider-collection.twig'
+                        default_value: []
+                        enabled: true
+                        secret: false
+                        storefront: false
+                        scopes:
+                            - global
+
+                - key: storefront
+                  name: Storefront
+                  description: OAuth providers available on the Storefront login page.
+                  scopes:
+                      - global
+                      - store
+                  enabled: true
+                  settings:
+                      - key: providers
+                        name: SSO Providers
+                        description: >
+                            Each provider entry configures one SSO login button.
+                            client_name must match a key defined in config/Yves/packages/knpu_oauth2_client.yaml.
+                        type: json
+                        template: '@SecurityOauthKnpu/Configuration/provider-collection.twig'
+                        default_value: []
+                        enabled: true
+                        secret: false
+                        storefront: true
+                        scopes:
+                            - global
+                            - store

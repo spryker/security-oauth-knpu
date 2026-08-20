@@ -1,3 +1,16 @@
-Action,Aktion
+Action,Action
 "Login with SSO","Login with SSO"
 "Login with Github","Login with GitHub"
+"Defaults to Client Name when left blank.","Defaults to Client Name when left blank."
+"Add Provider","Add Provider"
+"Client Name","Client Name"
+"Must match a client key in knpu_oauth2_client.yaml.","Must match a client key in knpu_oauth2_client.yaml."
+"Login Button Label","Login Button Label"
+"OAuth Scopes","OAuth Scopes"
+"Optional. Comma-separated list of OAuth scopes to request from the provider.","Optional. Comma-separated list of OAuth scopes to request from the provider."
+"State Prefix","State Prefix"
+"Additional Options","Additional Options"
+"Optional. Extra key-value parameters passed to the OAuth authorization request.","Optional. Extra key-value parameters passed to the OAuth authorization request."
+"Add Option","Add Option"
+Key,Key
+Value,Value

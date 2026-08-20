@@ -1,3 +1,16 @@
 Action,Aktion
 "Login with SSO","Anmeldung mit SSO"
 "Login with Github","Mit GitHub anmelden"
+"Defaults to Client Name when left blank.","Standardmäßig wird der Client-Name verwendet, wenn dieses Feld leer bleibt."
+"Add Provider","Anbieter hinzufügen"
+"Client Name",Client-Name
+"Must match a client key in knpu_oauth2_client.yaml.","Muss einem Client-Schlüssel in knpu_oauth2_client.yaml entsprechen."
+"Login Button Label","Bezeichnung des Anmelde-Buttons"
+"OAuth Scopes",OAuth-Berechtigungen
+"Optional. Comma-separated list of OAuth scopes to request from the provider.","Optional. Kommagetrennte Liste der OAuth-Berechtigungen, die beim Anbieter angefordert werden."
+"State Prefix",Status-Präfix
+"Additional Options","Zusätzliche Optionen"
+"Optional. Extra key-value parameters passed to the OAuth authorization request.","Optional. Zusätzliche Schlüssel-Wert-Parameter für die OAuth-Autorisierungsanfrage."
+"Add Option","Option hinzufügen"
+Key,Schlüssel
+Value,Wert

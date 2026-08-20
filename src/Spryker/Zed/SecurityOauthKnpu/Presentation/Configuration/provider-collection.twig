@@ -1,0 +1,222 @@
+{% set currentValue = setting.has_custom_value ? setting.current_value : setting.inherited_value %}
+{% set isDisabled = isEditable is defined and not isEditable %}
+{% set collectionId = 'providers-collection-' ~ setting.key | replace({':': '-'}) %}
+
+<textarea id="setting-{{ setting.key }}"
+          class="config-input"
+          data-original-value="{{ setting.current_value }}"
+          data-has-custom-value="{{ setting.has_custom_value ? '1' : '0' }}"
+          style="display:none"
+          {% if isDisabled %}disabled{% endif %}>{{ currentValue }}</textarea>
+
+<div id="{{ collectionId }}">
+    <div data-providers-entries></div>
+
+    {% if not isDisabled %}
+        <button type="button" class="btn btn-outline-primary btn-sm mt-2" data-add-provider>
+            <span class="material-symbols-outlined">add</span>
+            {{ 'Add Provider' | trans }}
+        </button>
+    {% endif %}
+</div>
+
+<template id="{{ collectionId }}-entry-tpl">
+    <div class="card mb-3" data-provider-entry>
+        <div class="card-body">
+            {% if not isDisabled %}
+                <button type="button" class="btn btn-sm btn-outline-danger float-end" data-remove-provider>
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            {% endif %}
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">{{ 'Client Name' | trans }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" name="client_name"
+                       placeholder="e.g. sso_merchant_portal"
+                       {% if isDisabled %}disabled{% endif %}>
+                <small class="form-text text-muted">{{ 'Must match a client key in knpu_oauth2_client.yaml.' | trans }}</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">{{ 'Login Button Label' | trans }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" name="link_text"
+                       placeholder="{{ 'Login with SSO' | trans }}"
+                       {% if isDisabled %}disabled{% endif %}>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">{{ 'OAuth Scopes' | trans }}</label>
+                <input type="text" class="form-control form-control-sm" name="scopes"
+                       placeholder="openid, email, profile"
+                       {% if isDisabled %}disabled{% endif %}>
+                <small class="form-text text-muted">{{ 'Optional. Comma-separated list of OAuth scopes to request from the provider.' | trans }}</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">{{ 'State Prefix' | trans }}</label>
+                <input type="text" class="form-control form-control-sm" name="state_prefix"
+                       placeholder="e.g. sso_merchant_portal"
+                       {% if isDisabled %}disabled{% endif %}>
+                <small class="form-text text-muted">{{ 'Defaults to Client Name when left blank.' | trans }}</small>
+            </div>
+
+            <div class="mb-0">
+                <label class="form-label fw-semibold">{{ 'Additional Options' | trans }}</label>
+                <small class="form-text text-muted d-block mb-2">{{ 'Optional. Extra key-value parameters passed to the OAuth authorization request.' | trans }}</small>
+                <div data-options-entries></div>
+                {% if not isDisabled %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-add-option>
+                        <span class="material-symbols-outlined">add</span>
+                        {{ 'Add Option' | trans }}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="{{ collectionId }}-option-tpl">
+    <div class="input-group input-group-sm mb-1" data-option-row>
+        <input type="text" class="form-control" name="option_key"
+               placeholder="{{ 'Key' | trans }}"
+               {% if isDisabled %}disabled{% endif %}>
+        <input type="text" class="form-control" name="option_value"
+               placeholder="{{ 'Value' | trans }}"
+               {% if isDisabled %}disabled{% endif %}>
+        {% if not isDisabled %}
+            <button type="button" class="btn btn-outline-danger" data-remove-option>
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        {% endif %}
+    </div>
+</template>
+
+<script>
+(function () {
+    var collectionId = '{{ collectionId }}';
+    var collection = document.getElementById(collectionId);
+    var textarea = document.getElementById('setting-{{ setting.key }}');
+    var entriesContainer = collection.querySelector('[data-providers-entries]');
+    var entryTemplate = document.getElementById(collectionId + '-entry-tpl');
+    var optionTemplate = document.getElementById(collectionId + '-option-tpl');
+
+    function scopesToString(scopes) {
+        if (!Array.isArray(scopes)) {
+            return '';
+        }
+
+        return scopes.join(', ');
+    }
+
+    function stringToScopes(value) {
+        return value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
+    }
+
+    function addOptionRow(container, key, value) {
+        var node = optionTemplate.content.cloneNode(true);
+        var row = node.querySelector('[data-option-row]');
+
+        row.querySelector('[name="option_key"]').value = key || '';
+        row.querySelector('[name="option_value"]').value = value || '';
+
+        var removeBtn = row.querySelector('[data-remove-option]');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                row.remove();
+                serialize();
+            });
+        }
+
+        container.appendChild(row);
+    }
+
+    function addProviderEntry(provider) {
+        var node = entryTemplate.content.cloneNode(true);
+        var entry = node.querySelector('[data-provider-entry]');
+
+        entry.querySelector('[name="client_name"]').value = (provider && provider.client_name) || '';
+        entry.querySelector('[name="state_prefix"]').value = (provider && provider.state_prefix) || '';
+        entry.querySelector('[name="link_text"]').value = (provider && provider.link_text) || '';
+        entry.querySelector('[name="scopes"]').value = provider ? scopesToString(provider.scopes) : '';
+
+        var optionsContainer = entry.querySelector('[data-options-entries]');
+        var options = (provider && provider.options) || {};
+        Object.keys(options).forEach(function (key) {
+            addOptionRow(optionsContainer, key, options[key]);
+        });
+
+        var removeBtn = entry.querySelector('[data-remove-provider]');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                entry.remove();
+                serialize();
+            });
+        }
+
+        var addOptionBtn = entry.querySelector('[data-add-option]');
+        if (addOptionBtn) {
+            addOptionBtn.addEventListener('click', function () {
+                addOptionRow(optionsContainer, '', '');
+                serialize();
+            });
+        }
+
+        entriesContainer.appendChild(entry);
+    }
+
+    function serialize() {
+        var providers = [];
+
+        entriesContainer.querySelectorAll('[data-provider-entry]').forEach(function (entry) {
+            var options = {};
+            entry.querySelectorAll('[data-option-row]').forEach(function (row) {
+                var key = row.querySelector('[name="option_key"]').value.trim();
+                var value = row.querySelector('[name="option_value"]').value.trim();
+
+                if (key) {
+                    options[key] = value;
+                }
+            });
+
+            providers.push({
+                client_name: entry.querySelector('[name="client_name"]').value.trim(),
+                state_prefix: entry.querySelector('[name="state_prefix"]').value.trim(),
+                link_text: entry.querySelector('[name="link_text"]').value.trim(),
+                scopes: stringToScopes(entry.querySelector('[name="scopes"]').value),
+                options: options,
+            });
+        });
+
+        textarea.value = JSON.stringify(providers);
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function init() {
+        var providers = [];
+
+        try {
+            providers = JSON.parse(textarea.value || '[]');
+        } catch (e) {
+            providers = [];
+        }
+
+        if (Array.isArray(providers)) {
+            providers.forEach(function (provider) {
+                addProviderEntry(provider);
+            });
+        }
+
+        var addBtn = collection.querySelector('[data-add-provider]');
+        if (addBtn) {
+            addBtn.addEventListener('click', function () {
+                addProviderEntry(null);
+                serialize();
+            });
+        }
+
+        entriesContainer.addEventListener('input', serialize);
+    }
+
+    init();
+}());
+</script>

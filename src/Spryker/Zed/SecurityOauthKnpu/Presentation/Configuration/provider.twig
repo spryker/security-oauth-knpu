@@ -1,0 +1,169 @@
+{% set currentValue = setting.has_custom_value ? setting.current_value : setting.inherited_value %}
+{% set isDisabled = isEditable is defined and not isEditable %}
+{% set providerId = 'provider-' ~ setting.key | replace({':': '-'}) %}
+
+<textarea id="setting-{{ setting.key }}"
+          class="config-input"
+          data-original-value="{{ setting.current_value }}"
+          data-has-custom-value="{{ setting.has_custom_value ? '1' : '0' }}"
+          style="display:none"
+          {% if isDisabled %}disabled{% endif %}>{{ currentValue }}</textarea>
+
+<div id="{{ providerId }}" class="card">
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'Client Name' | trans }} <span class="text-danger">*</span></label>
+            <input type="text" id="{{ providerId }}-client-name" class="form-control form-control-sm"
+                   placeholder="e.g. sso_backoffice"
+                   {% if isDisabled %}disabled{% endif %}>
+            <small class="form-text text-muted">{{ 'Must match a client key in knpu_oauth2_client.yaml.' | trans }}</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'Login Button Label' | trans }} <span class="text-danger">*</span></label>
+            <input type="text" id="{{ providerId }}-link-text" class="form-control form-control-sm"
+                   placeholder="{{ 'Login with SSO' | trans }}"
+                   {% if isDisabled %}disabled{% endif %}>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'OAuth Scopes' | trans }}</label>
+            <input type="text" id="{{ providerId }}-scopes" class="form-control form-control-sm"
+                   placeholder="openid, email, profile"
+                   {% if isDisabled %}disabled{% endif %}>
+            <small class="form-text text-muted">{{ 'Optional. Comma-separated list of OAuth scopes to request from the provider.' | trans }}</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{{ 'State Prefix' | trans }}</label>
+            <input type="text" id="{{ providerId }}-state-prefix" class="form-control form-control-sm"
+                   placeholder="e.g. sso_backoffice"
+                   {% if isDisabled %}disabled{% endif %}>
+            <small class="form-text text-muted">{{ 'Defaults to Client Name when left blank.' | trans }}</small>
+        </div>
+
+        <div class="mb-0">
+            <label class="form-label fw-semibold">{{ 'Additional Options' | trans }}</label>
+            <small class="form-text text-muted d-block mb-2">{{ 'Optional. Extra key-value parameters passed to the OAuth authorization request.' | trans }}</small>
+            <div id="{{ providerId }}-options"></div>
+            {% if not isDisabled %}
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" id="{{ providerId }}-add-option">
+                    <span class="material-symbols-outlined">add</span>
+                    {{ 'Add Option' | trans }}
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<template id="{{ providerId }}-option-tpl">
+    <div class="input-group input-group-sm mb-1" data-option-row>
+        <input type="text" class="form-control" name="option_key"
+               placeholder="{{ 'Key' | trans }}"
+               {% if isDisabled %}disabled{% endif %}>
+        <input type="text" class="form-control" name="option_value"
+               placeholder="{{ 'Value' | trans }}"
+               {% if isDisabled %}disabled{% endif %}>
+        {% if not isDisabled %}
+            <button type="button" class="btn btn-outline-danger" data-remove-option>
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        {% endif %}
+    </div>
+</template>
+
+<script>
+(function () {
+    var providerId = '{{ providerId }}';
+    var textarea = document.getElementById('setting-{{ setting.key }}');
+    var optionsContainer = document.getElementById(providerId + '-options');
+    var optionTemplate = document.getElementById(providerId + '-option-tpl');
+
+    function scopesToString(scopes) {
+        if (!Array.isArray(scopes)) {
+            return '';
+        }
+
+        return scopes.join(', ');
+    }
+
+    function stringToScopes(value) {
+        return value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
+    }
+
+    function addOptionRow(key, value) {
+        var node = optionTemplate.content.cloneNode(true);
+        var row = node.querySelector('[data-option-row]');
+
+        row.querySelector('[name="option_key"]').value = key || '';
+        row.querySelector('[name="option_value"]').value = value || '';
+
+        var removeBtn = row.querySelector('[data-remove-option]');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                row.remove();
+                serialize();
+            });
+        }
+
+        optionsContainer.appendChild(row);
+    }
+
+    function serialize() {
+        var options = {};
+        optionsContainer.querySelectorAll('[data-option-row]').forEach(function (row) {
+            var key = row.querySelector('[name="option_key"]').value.trim();
+            var value = row.querySelector('[name="option_value"]').value.trim();
+
+            if (key) {
+                options[key] = value;
+            }
+        });
+
+        var provider = {
+            client_name: document.getElementById(providerId + '-client-name').value.trim(),
+            state_prefix: document.getElementById(providerId + '-state-prefix').value.trim(),
+            link_text: document.getElementById(providerId + '-link-text').value.trim(),
+            scopes: stringToScopes(document.getElementById(providerId + '-scopes').value),
+            options: options,
+        };
+
+        textarea.value = JSON.stringify([provider]);
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function init() {
+        var providers = [];
+
+        try {
+            providers = JSON.parse(textarea.value || '[]');
+        } catch (e) {
+            providers = [];
+        }
+
+        var provider = Array.isArray(providers) && providers.length > 0 ? providers[0] : {};
+
+        document.getElementById(providerId + '-client-name').value = provider.client_name || '';
+        document.getElementById(providerId + '-state-prefix').value = provider.state_prefix || '';
+        document.getElementById(providerId + '-link-text').value = provider.link_text || '';
+        document.getElementById(providerId + '-scopes').value = scopesToString(provider.scopes || []);
+
+        var options = provider.options || {};
+        Object.keys(options).forEach(function (key) {
+            addOptionRow(key, options[key]);
+        });
+
+        var addOptionBtn = document.getElementById(providerId + '-add-option');
+        if (addOptionBtn) {
+            addOptionBtn.addEventListener('click', function () {
+                addOptionRow('', '');
+                serialize();
+            });
+        }
+
+        document.getElementById(providerId).addEventListener('input', serialize);
+    }
+
+    init();
+}());
+</script>
