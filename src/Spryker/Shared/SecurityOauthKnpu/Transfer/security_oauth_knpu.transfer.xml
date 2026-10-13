@@ -95,6 +95,8 @@
 
     <transfer name="OauthAuthenticationLink">
         <property name="href" type="string"/>
+        <property name="text" type="string"/>
+        <property name="target" type="string"/>
     </transfer>
 
     <transfer name="Customer">
@@ -107,6 +109,7 @@
 
     <transfer name="UserConditions" strict="true">
         <property name="userIds" type="int[]" singular="idUser" description="A collection of user identifiers."/>
+        <property name="throwUserNotFoundException" type="bool" deprecated="Exists for BC reasons only."/>
     </transfer>
 
     <transfer name="UserCollection" strict="true">
@@ -115,25 +118,39 @@
 
     <transfer name="User">
         <property name="idUser" type="int"/>
+        <property name="status" type="string"/>
     </transfer>
 
     <transfer name="MerchantUserCriteria">
+        <property name="idMerchantUser" type="int"/>
+        <property name="withUser" type="bool"/>
     </transfer>
 
     <transfer name="MerchantUser">
+        <property name="idMerchantUser" type="int"/>
     </transfer>
 
     <transfer name="AclEntityMetadataConfig">
+        <property name="aclEntityMetadataCollection" type="AclEntityMetadataCollection"/>
     </transfer>
 
     <transfer name="AclEntityMetadata">
+        <property name="entityName" type="string"/>
+        <property name="defaultGlobalOperationMask" type="int"/>
     </transfer>
 
     <transfer name="AclEntityRule">
+        <property name="entity" type="string"/>
+        <property name="scope" type="string"/>
+        <property name="permissionMask" type="int"/>
     </transfer>
 
     <transfer name="UserCollectionResponse" strict="true">
         <property name="users" type="User[]" singular="user"/>
+    </transfer>
+
+    <transfer name="AclEntityMetadataCollection">
+        <property name="collection" type="array" singular="aclEntityMetadata" associative="true"/>
     </transfer>
 
 </transfers>
